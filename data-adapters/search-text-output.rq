@@ -1,0 +1,19 @@
+PREFIX ac: <http://audiocommons.org/ns/audiocommons#>
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+PREFIX iter: <http://w3id.org/sparql-generate/iter/>
+PREFIX fn: <http://w3id.org/sparql-generate/fn/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+GENERATE {
+  ?audioClip rdf:type ac:AudioClip .
+  ?audioClip ac:available_as ?audioFile .
+  ?audioClip dc:title ?title .
+  ?audioFile rdf:type ac:AudioFile
+}
+SOURCE ?searchURI AS ?source
+ITERATOR iter:JSONPath(?source,"$..results[*]") AS ?res
+WHERE {
+  BIND(fn:JSONPath(?res, ".id" ) AS ?id)
+  BIND(IRI(fn:JSONPath(?res, "url")) AS ?audioClip)
+  BIND(IRI(fn:JSONPath(?res, "previews.preview-lq-ogg")) AS ?audioFile)
+  BIND(fn:JSONPath(?res, "name") AS ?title)
+}
