@@ -9,7 +9,7 @@ GENERATE {
   ?audioClip dc:title ?title .
   ?audioFile rdf:type ac:AudioFile
 }
-SOURCE ?searchURI AS ?source
+SOURCE <http://freesound.org/apiv2/search/text/?query=$pattern&token=$token&fields=id,url,download,previews,name,preview-lq> AS ?source
 ITERATOR iter:JSONPath(?source,"$..results[*]") AS ?res
 WHERE {
   BIND(fn:JSONPath(?res, ".id" ) AS ?id)

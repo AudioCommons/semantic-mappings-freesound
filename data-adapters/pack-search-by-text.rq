@@ -1,0 +1,29 @@
+PREFIX ac: <http://audiocommons.org/ns/audiocommons#>
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+PREFIX iter: <http://w3id.org/sparql-generate/iter/>
+PREFIX fn: <http://w3id.org/sparql-generate/fn/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> 
+PREFIX cc: <http://creativecommons.org/ns#>
+PREFIX http: <http://www.w3.org/2011/http#>
+GENERATE { 
+  ?pack rdf:type ac:AudioCollection . 
+  GENERATE {
+    ?pack ac:compiledBy ?user .
+    ?pack dc:title ?packName    
+  }
+  SOURCE ?jsonPack AS ?source2
+  WHERE {
+    BIND(fn:JSONPath(?source2, "name") AS ?packName)
+    BIND(fn:JSONPath(?source2, "username") AS ?name)
+  } . 
+}
+SOURCE <https://freesound.org/apiv2/search/text/?query=$pattern&token=$token&f&fields=id,url,name,pack> AS ?source
+ITERATOR iter:JSONPath(?source,"$..results[*]") AS ?res
+WHERE {
+  BIND(IRI(fn:JSONPath(?res, "url")) AS ?audioClip) 
+  BIND(fn:JSONPath(?res, "name") AS ?title) 
+  BIND(IRI(fn:JSONPath(?res, "pack")) AS ?pack)
+  BIND(fn:JSONPath(?res, "pack") AS ?strpack)
+  BIND(IRI(CONCAT(?strpack, "?format=json&token=$token")) AS ?jsonPack)
+  FILTER isIRI(?pack)
+}
