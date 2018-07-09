@@ -1,0 +1,24 @@
+PREFIX ac: <http://audiocommons.org/ns/audiocommons#>
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+PREFIX iter: <http://w3id.org/sparql-generate/iter/>
+PREFIX fn: <http://w3id.org/sparql-generate/fn/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+GENERATE {
+  ?audioClip rdf:type ac:AudioClip .
+  ?audioClip ac:available_as ?audioFile .
+  ?audioClip dc:title ?title .
+  ?audioFile rdf:type ac:AudioFile .
+  ?audioClip rdf:type prov:Entity .
+  <http://freesound.org> rdf:type prov:Agent .
+  <http://freesound.org> rdf:type foaf:Organization .
+  <http://freesound.org> foaf:name "Freesound" .
+  ?audioClip prov:wasAttributedTo <http://freesound.org>
+}
+SOURCE <http://freesound.org/apiv2/sounds/$trackId?token=$token&fields=id,url,download,previews,name,preview-lq&format=json> AS ?source
+WHERE {
+  BIND(IRI(fn:JSONPath(?source, "url")) AS ?audioClip)
+  BIND(IRI(fn:JSONPath(?source, "previews.preview-lq-ogg")) AS ?audioFile)
+  BIND(fn:JSONPath(?source, "name") AS ?title)
+}
