@@ -21,35 +21,37 @@ GENERATE {
   ?audioCollection
       rdf:type ac:AudioCollection, prov:Entity ;
       prov:wasAttributedTo <http://freesound.org> ;
-      ac:memberNode ?audioCollectionNode ;
       ac:nodeCount ?nodeCount .
 
-  ?audioCollectionNode
-      a ac:AudioCollectionNode ;
-      ac:nodeIndex ?index ;
-      ac:nodeContent ?audioClip .
+  GENERATE {
+  	?audioCollection ac:memberNode ?audioCollectionNode .
+    ?audioCollectionNode
+        a ac:AudioCollectionNode ;
+        ac:nodeIndex ?index ;
+        ac:nodeContent ?audioClip .
 
-  ?audioClip
-      rdf:type ac:AudioClip, prov:Entity ;
-      ac:available_as ?audioFile ;
-      dc:title ?title ;
-      prov:wasAttributedTo <http://freesound.org> .
-  ?audioFile rdf:type ac:AudioFile .
+    ?audioClip
+        rdf:type ac:AudioClip, prov:Entity ;
+        ac:available_as ?audioFile ;
+        dc:title ?title ;
+        prov:wasAttributedTo <http://freesound.org> .
+    ?audioFile rdf:type ac:AudioFile .
+  }
+  ITERATOR iter:JSONElement(?source,"$.results[*]") AS ?resIterator
+  WHERE {
+    BIND(BNODE() AS ?audioCollectionNode)
+    BIND(fn:JSONPath(?resIterator, "element") AS ?res)
+    BIND(fn:JSONPath(?resIterator, "position") AS ?indexFromZero)
+    BIND(?indexFromZero + 1 AS ?index)
+
+    BIND(IRI(fn:JSONPath(?res, "url")) AS ?audioClip)
+    BIND(IRI(fn:JSONPath(?res, "previews.preview-lq-ogg")) AS ?audioFile)
+    BIND(fn:JSONPath(?res, "name") AS ?title)
+  } .
+
 }
 SOURCE <http://freesound.org/apiv2/search/text/?query=$pattern&token=$token&fields=id,url,download,previews,name,preview-lq> AS ?source
-ITERATOR iter:JSONElement(?source,"$.results[*]") AS ?resIterator
 WHERE {
-  {	SELECT ?searchAction ?audioCollection WHERE {
-      BIND(BNODE() AS ?searchAction)
-      BIND(BNODE() AS ?audioCollection)
-    }
-  }
-  BIND(BNODE() AS ?audioCollectionNode)
-  BIND(fn:JSONPath(?resIterator, "element") AS ?res)
-  BIND(fn:JSONPath(?resIterator, "position") AS ?indexFromZero)
-  BIND(?indexFromZero + 1 AS ?index)
-
-  BIND(IRI(fn:JSONPath(?res, "url")) AS ?audioClip)
-  BIND(IRI(fn:JSONPath(?res, "previews.preview-lq-ogg")) AS ?audioFile)
-  BIND(fn:JSONPath(?res, "name") AS ?title)
+  BIND(BNODE() AS ?searchAction)
+  BIND(BNODE() AS ?audioCollection)
 }
