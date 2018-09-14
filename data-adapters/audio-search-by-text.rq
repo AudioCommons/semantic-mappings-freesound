@@ -5,14 +5,18 @@ PREFIX fn: <http://w3id.org/sparql-generate/fn/>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX prov: <http://www.w3.org/ns/prov#>
 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX schema: <http://schema.org/>
 
 GENERATE {
-  ?audioClip
-      rdf:type ac:AudioClip, prov:Entity ;
-      ac:available_as ?audioFile ;
-      dc:title ?title ;
-      prov:wasAttributedTo <http://freesound.org> .
-  ?audioFile rdf:type ac:AudioFile .
+  <http://freesound.org>
+      rdf:type prov:Agent, foaf:Organization ;
+      foaf:name "Freesound" .
+
+  ?searchAction
+      a schema:SearchAction ;
+      schema:object <http://freesound.org> ;
+      schema:query "$pattern" ;
+      schema:result ?audioCollection .
 
   ?audioCollection
       rdf:type ac:AudioCollection, prov:Entity ;
@@ -25,23 +29,27 @@ GENERATE {
       ac:nodeIndex ?index ;
       ac:nodeContent ?audioClip .
 
-  <http://freesound.org>
-      rdf:type prov:Agent, foaf:Organization ;
-      foaf:name "Freesound" .
+  ?audioClip
+      rdf:type ac:AudioClip, prov:Entity ;
+      ac:available_as ?audioFile ;
+      dc:title ?title ;
+      prov:wasAttributedTo <http://freesound.org> .
+  ?audioFile rdf:type ac:AudioFile .
 }
 SOURCE <http://freesound.org/apiv2/search/text/?query=$pattern&token=$token&fields=id,url,download,previews,name,preview-lq> AS ?source
 ITERATOR iter:JSONElement(?source,"$.results[*]") AS ?resIterator
 WHERE {
   {	SELECT ?audioCollection WHERE {
+      BIND(BNODE() AS ?searchAction)
       BIND(BNODE() AS ?audioCollection)
     }
   }
+  BIND(BNODE() AS ?audioCollectionNode)
   BIND(fn:JSONPath(?resIterator, "element") AS ?res)
   BIND(fn:JSONPath(?resIterator, "position") AS ?indexFromZero)
   BIND(?indexFromZero + 1 AS ?index)
-  BIND(fn:JSONPath(?res, ".id" ) AS ?id)
+
   BIND(IRI(fn:JSONPath(?res, "url")) AS ?audioClip)
   BIND(IRI(fn:JSONPath(?res, "previews.preview-lq-ogg")) AS ?audioFile)
   BIND(fn:JSONPath(?res, "name") AS ?title)
-  BIND(BNODE() AS ?audioCollectionNode)
 }
