@@ -39,7 +39,7 @@ GENERATE {
 SOURCE <http://freesound.org/apiv2/search/text/?query=$pattern&token=$token&fields=id,url,download,previews,name,preview-lq> AS ?source
 ITERATOR iter:JSONElement(?source,"$.results[*]") AS ?resIterator
 WHERE {
-  {	SELECT ?audioCollection WHERE {
+  {	SELECT ?searchAction ?audioCollection WHERE {
       BIND(BNODE() AS ?searchAction)
       BIND(BNODE() AS ?audioCollection)
     }
