@@ -41,7 +41,7 @@ GENERATE {
         prov:wasAttributedTo <http://freesound.org> .
     ?audioFile rdf:type ac:AudioFile .
   }
-  ITERATOR iter:JSONElement(?source,"$.results[*]") AS ?resIterator
+  ITERATOR iter:JSONElement(?source,"results[*]") AS ?resIterator
   WHERE {
     BIND(BNODE() AS ?audioCollectionNode)
     BIND(fn:JSONPath(?resIterator, "element") AS ?res)
@@ -57,7 +57,7 @@ GENERATE {
 SOURCE <http://freesound.org/apiv2/search/text/?query=$pattern&token=$token&fields=id,url,download,previews,name,preview-lq> AS ?source
 WHERE {
   BIND(BNODE() AS ?searchAction)
-  BIND(fn:JSONPath(?source, "$.results") AS ?resultSet)
+  BIND(fn:JSONPath(?source, "results") AS ?resultSet)
   BIND(IF(BOUND(?resultSet), schema:CompletedActionStatus, schema:FailedActionStatus) AS ?actionStatus)
   OPTIONAL {
   	BIND(BNODE() AS ?audioCollection).
