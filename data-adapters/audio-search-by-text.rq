@@ -16,7 +16,11 @@ GENERATE {
       a schema:SearchAction ;
       schema:object <http://freesound.org> ;
       schema:query "$pattern" ;
-      schema:result ?audioCollection .
+#      schema:startTime $startTime;
+      schema:endTime ?endTime;
+      schema:actionStatus ?actionStatus;
+      schema:result ?audioCollection ;
+      schema:error ?error .
 
   ?audioCollection
       rdf:type ac:AudioCollection, prov:Entity ;
@@ -53,5 +57,15 @@ GENERATE {
 SOURCE <http://freesound.org/apiv2/search/text/?query=$pattern&token=$token&fields=id,url,download,previews,name,preview-lq> AS ?source
 WHERE {
   BIND(BNODE() AS ?searchAction)
-  BIND(BNODE() AS ?audioCollection)
+  BIND(fn:JSONPath(?source, "$.results") AS ?resultSet)
+  BIND(IF(BOUND(?resultSet), schema:CompletedActionStatus, schema:FailedActionStatus) AS ?actionStatus)
+  OPTIONAL {
+  	BIND(BNODE() AS ?audioCollection).
+    FILTER(BOUND(?resultSet))
+  }
+  OPTIONAL {
+  	BIND(BNODE() AS ?error)
+    FILTER(!BOUND(?resultSet))
+  }
+  BIND(NOW() AS ?endTime)
 }
