@@ -1,4 +1,4 @@
-PREFIX ac: <http://audiocommons.org/ns/audiocommons#>
+PREFIX ac: <https://w3id.org/ac-ontology/aco#>
 PREFIX dc: <http://purl.org/dc/elements/1.1/>
 PREFIX iter: <http://w3id.org/sparql-generate/iter/>
 PREFIX fn: <http://w3id.org/sparql-generate/fn/>
