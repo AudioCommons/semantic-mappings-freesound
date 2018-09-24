@@ -3,9 +3,22 @@ PREFIX dc: <http://purl.org/dc/elements/1.1/>
 PREFIX iter: <http://w3id.org/sparql-generate/iter/>
 PREFIX fn: <http://w3id.org/sparql-generate/fn/>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 PREFIX prov: <http://www.w3.org/ns/prov#>
 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 PREFIX schema: <http://schema.org/>
+PREFIX cc: <https://creativecommons.org/ns#>
+PREFIX event: <http://purl.org/NET/c4dm/event.owl#>
+PREFIX time: <https://www.w3.org/2006/time#>
+PREFIX ebu: <http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#>
+
+PREFIX freesound-sounds: <https://w3id.org/audiocommons/services/freesound/sounds/>
+PREFIX freesound-users: <https://w3id.org/audiocommons/services/freesound/users/>
+PREFIX freesound-packs: <https://w3id.org/audiocommons/services/freesound/packs/>
+
+# TODO: add other previews and their description
+# TODO: add other images and their description
+# TODO: generate autarkic pack URI
 
 GENERATE {
   <http://freesound.org>
@@ -16,9 +29,9 @@ GENERATE {
       a schema:SearchAction ;
       schema:object <http://freesound.org> ;
       schema:query "$pattern" ;
-      schema:startTime $startTime;
-      schema:endTime ?endTime;
-      schema:actionStatus ?actionStatus;
+      schema:startTime $startTime ;
+      schema:endTime ?endTime ;
+      schema:actionStatus ?actionStatus ;
       schema:result ?audioCollection ;
       schema:error ?error .
 
@@ -35,11 +48,34 @@ GENERATE {
         ac:nodeContent ?audioClip .
 
     ?audioClip
-        rdf:type ac:AudioClip, prov:Entity ;
-        ac:available_as ?audioFile ;
+        a ac:AudioClip, prov:Entity ;
         dc:title ?title ;
-        prov:wasAttributedTo <http://freesound.org> .
-    ?audioFile rdf:type ac:AudioFile .
+        dc:description ?description ;
+        ac:author ?author ;
+        ac:image ?image ;
+        ac:duration ?duration ;
+        cc:license ?license ;
+        prov:wasAttributedTo <http://freesound.org> ;
+        ac:parentCollection ?parentCollection ;
+        ac:audioCategory ?tagSet ;
+        ac:encodesDigitalSignal ?signal ;
+        ac:available_as ?audioFileLqOgg .
+
+    ?audioPublication
+        a ac:AudioPublication ;
+        ac:publishedAudioManifestation ?audioClip ;
+        event:time [
+            a time:TemporalEntity, time:Instant ;
+            time:inXSDDateTime ?creationDateTime
+        ] .
+
+    ?signal
+        rdf:type ac:DigitalSignal ;
+        ac:channels ?signalChannels ;
+        ac:bitsPerSample ?signalBitsPerSample ;
+        ac:sampleRate ?signalSampleRate .
+
+    ?audioFileLqOgg rdf:type ac:AudioFile .
   }
   ITERATOR iter:JSONElement(?source,"results[*]") AS ?resIterator
   WHERE {
@@ -48,13 +84,29 @@ GENERATE {
     BIND(fn:JSONPath(?resIterator, "position") AS ?indexFromZero)
     BIND(?indexFromZero + 1 AS ?index)
 
-    BIND(IRI(fn:JSONPath(?res, "url")) AS ?audioClip)
-    BIND(IRI(fn:JSONPath(?res, "previews.preview-lq-ogg")) AS ?audioFile)
+    BIND(IRI(CONCAT(STR(freesound-sounds:), STR(fn:JSONPath(?res, "id")))) AS ?audioClip)
+#    BIND(IRI(fn:JSONPath(?res, "url")) AS ?audioClip)
     BIND(fn:JSONPath(?res, "name") AS ?title)
+    BIND(fn:JSONPath(?res, "description") AS ?description)
+    BIND(IRI(fn:JSONPath(?res, "pack")) AS ?parentCollection)
+    BIND(IRI(CONCAT(STR(freesound-users:), fn:JSONPath(?res, "username"))) AS ?author)
+    BIND(IRI(fn:JSONPath(?res, "images.waveform_m")) AS ?image)
+    BIND(1000 * fn:JSONPath(?res, "duration") AS ?duration)
+    BIND(IRI(fn:JSONPath(?res, "license")) AS ?license)
+    BIND(IRI(fn:JSONPath(?res, "tags")) AS ?tagSet)
+    BIND(IRI(fn:JSONPath(?res, "previews.preview-lq-ogg")) AS ?audioFileLqOgg)
+
+    BIND(BNODE() AS ?signal)
+    BIND(fn:JSONPath(?res, "channels") AS ?signalChannels)
+    BIND(fn:JSONPath(?res, "bitdepth") AS ?signalBitsPerSample)
+    BIND(fn:JSONPath(?res, "samplerate") AS ?signalSampleRate)
+
+    BIND(BNODE() AS ?audioPublication)
+    BIND(xsd:dateTime(fn:JSONPath(?res, "created")) AS ?creationDateTime)
   } .
 
 }
-SOURCE <http://freesound.org/apiv2/search/text/?query=$pattern&token=$token&fields=id,url,download,previews,name,preview-lq> AS ?source
+SOURCE <http://freesound.org/apiv2/search/text/?query=$pattern&token=$token&fields=id,name,description,images,pack,username,created,duration,license,tags,channels,bitdepth,samplerate,previews> AS ?source
 WHERE {
   BIND(BNODE() AS ?searchAction)
   BIND(fn:JSONPath(?source, "results") AS ?resultSet)
