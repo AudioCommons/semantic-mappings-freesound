@@ -20,6 +20,7 @@ PREFIX freesound-packs: <https://w3id.org/audiocommons/services/freesound/packs/
 
 # TODO: add other previews and their description
 # TODO: add other images and their description
+# TODO: fix tags
 
 GENERATE {
   <http://freesound.org>
