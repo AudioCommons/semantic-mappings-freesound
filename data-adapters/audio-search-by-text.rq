@@ -12,13 +12,14 @@ PREFIX event: <http://purl.org/NET/c4dm/event.owl#>
 PREFIX time: <https://www.w3.org/2006/time#>
 PREFIX ebu: <http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#>
 
+PREFIX freesound-api-packs: <http://freesound.org/apiv2/packs/>
+
 PREFIX freesound-sounds: <https://w3id.org/audiocommons/services/freesound/sounds/>
 PREFIX freesound-users: <https://w3id.org/audiocommons/services/freesound/users/>
 PREFIX freesound-packs: <https://w3id.org/audiocommons/services/freesound/packs/>
 
 # TODO: add other previews and their description
 # TODO: add other images and their description
-# TODO: generate autarkic pack URI
 
 GENERATE {
   <http://freesound.org>
@@ -56,10 +57,16 @@ GENERATE {
         ac:duration ?duration ;
         cc:license ?license ;
         prov:wasAttributedTo <http://freesound.org> ;
-        ac:parentCollection ?parentCollection ;
+        ac:defaultContainerNode _:defaultContainerNode ;
         ac:audioCategory ?tagSet ;
         ac:encodesDigitalSignal ?signal ;
         ac:available_as ?audioFileLqOgg .
+
+    _:defaultContainerNode a ac:AudioCollectionNode .
+
+    ?parentCollection
+        a ac:AudioCollection ;
+        ac:memberNode _:defaultContainerNode .
 
     ?audioPublication
         a ac:AudioPublication ;
@@ -88,7 +95,8 @@ GENERATE {
 #    BIND(IRI(fn:JSONPath(?res, "url")) AS ?audioClip)
     BIND(fn:JSONPath(?res, "name") AS ?title)
     BIND(fn:JSONPath(?res, "description") AS ?description)
-    BIND(IRI(fn:JSONPath(?res, "pack")) AS ?parentCollection)
+    BIND(REPLACE(fn:JSONPath(?res, "pack"), STR(freesound-api-packs:), STR(freesound-packs:)) AS ?packURIWithEndingSlash)
+    BIND(IRI(SUBSTR(?packURIWithEndingSlash, 1, STRLEN(?packURIWithEndingSlash) - 1)) AS ?parentCollection)
     BIND(IRI(CONCAT(STR(freesound-users:), fn:JSONPath(?res, "username"))) AS ?author)
     BIND(IRI(fn:JSONPath(?res, "images.waveform_m")) AS ?image)
     BIND(1000 * fn:JSONPath(?res, "duration") AS ?duration)
