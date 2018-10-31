@@ -12,6 +12,7 @@ PREFIX event: <http://purl.org/NET/c4dm/event.owl#>
 PREFIX time: <https://www.w3.org/2006/time#>
 PREFIX ebu: <http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#>
 PREFIX ma: <http://www.w3.org/ns/ma-ont#>
+PREFIC skos: <http://www.w3.org/2004/02/skos/core#>
 
 PREFIX encoding_mp3: <http://www.ebu.ch/metadata/ontologies/skos/ebu_AudioCompressionCodeCS#_8.4>
 PREFIX encoding_ogg: <http://www.ebu.ch/metadata/ontologies/skos/ebu_AudioCompressionCodeCS#_26>
@@ -25,10 +26,8 @@ PREFIX freesound-users: <https://w3id.org/audiocommons/services/freesound/users/
 PREFIX freesound-packs: <https://w3id.org/audiocommons/services/freesound/packs/>
 PREFIX freesound-tags: <https://w3id.org/audiocommons/services/freesound/tags/>
 
-# TODO: check ac:image usage
 # TODO: check ac:author is not in the ontology
-# TODO: which vocab use to describe images?
-# TODO: check previews and signal descriptions
+# TODO: find a way to distinguish spectrograms from waveforms without using the labels
 
 GENERATE {
   <http://freesound.org>
@@ -68,7 +67,7 @@ GENERATE {
         cc:license ?license ;
 #        prov:wasAttributedTo <http://freesound.org> ;
         ac:defaultContainerNode _:defaultContainerNode ;
-        ac:publicationOf ?signal ;
+        # ac:publicationOf ?signal ;
         # ac:signalChannels ?signalChannels ;
         # ac:bitsPerSample ?signalBitsPerSample ;
         # ac:sampleRate ?signalSampleRate ;
@@ -77,36 +76,36 @@ GENERATE {
         # or schema:encoding (it would break FRBR, but just saying...)
 
     _:waveform_image_m
-        a ebu:Picture, ma:Image, schema:ImageObject ; # afv:Waveform?
-        schema:contentUrl ?waveform_image_m_url ; # or ma:locator or ebu:locator
-        schema:caption "Waveform" ;
-        schema:height 71 ; # or ma:frameHeight or ebu:height
-        schema:width 120 . # or ma:frameWidth or ebu:width
+        a ebu:Picture; #, ma:Image, schema:ImageObject, ... afv:Waveform?
+        ebu:locator ?waveform_image_m_url ; # or ma:locator or schema:contentUrl
+        skos:prefLabel "Waveform" ;
+        ebu:frameHeight 71 ; # or ma:frameHeight or schema:height
+        ebu:frameWidth 120 . # or ma:frameWidth or schema:width
 
     _:waveform_image_l
-        a ebu:Picture, ma:Image, schema:ImageObject ; # afv:Waveform?
-        schema:contentUrl ?waveform_image_l_url ;
-        schema:caption "Waveform" ;
-        schema:height 201 ;
-        schema:width 900 .
+        a ebu:Picture; #, ma:Image, schema:ImageObject ; afv:Waveform?
+        ebu:locator ?waveform_image_l_url ;
+        skos:prefLabel "Waveform" ;
+        ebu:frameHeight 201 ;
+        ebu:frameWidth 900 .
 
     _:spectral_image_m
-        a ebu:Picture, ma:Image, schema:ImageObject ; # afv:Spectrogram?
-        schema:contentUrl ?spectral_image_m_url ;
-        schema:caption "Spectrogram" ;
-        schema:height 50 ;
-        schema:width 50 .
+        a ebu:Picture; #, ma:Image, schema:ImageObject ; afv:Spectrogram?
+        ebu:locator ?spectral_image_m_url ;
+        skos:prefLabel "Spectrogram" ;
+        ebu:frameHeight 50 ;
+        ebu:frameWidth 50 .
 
     _:spectral_image_l
-        a ebu:Picture, ma:Image, schema:ImageObject ; # afv:Spectrogram?
-        schema:contentUrl ?spectral_image_l_url ;
-        schema:caption "Spectrogram" ;
-        schema:height 201 ;
-        schema:width 900 .
+        a ebu:Picture; #, ma:Image, schema:ImageObject ; afv:Spectrogram?
+        ebu:locator ?spectral_image_l_url ;
+        skos:prefLabel "Spectrogram" ;
+        ebu:frameHeight 201 ;
+        ebu:frameWidth 900 .
 
     _:originalAudioFile
-        a ebu:MediaResource, schema:AudioObject ;
-        schema:contentUrl ?originalAudioFileUrl ; # or ma:locator or ebu:locator
+        a ebu:MediaResource; #, schema:AudioObject ;
+        ebu:locator ?originalAudioFileUrl ; # or ma:locator or schema:contentUrl
         ebu:bitRate ?originalAudioFileBitrate;
         ebu:hasAudioEncodingFormat ?originalAudioFileEncoding ;
         ebu:audioChannelNumber ?signalChannels ;
@@ -114,8 +113,8 @@ GENERATE {
         ebu:sampleRate ?signalSampleRate .
 
     _:audioFileLqOgg
-        a ebu:MediaResource, schema:AudioObject ;
-        schema:contentUrl ?audioFileLqOggUrl ; # or ma:locator or ebu:locator
+        a ebu:MediaResource; #, schema:AudioObject ;
+        ebu:locator ?audioFileLqOggUrl ; # or ma:locator or schema:contentUrl
         ebu:bitRate 80000; # 80 kbps or ma:frameWidth or ebu:width
         ebu:hasAudioEncodingFormat encoding_ogg: ;
         ebu:audioChannelNumber ?signalChannels ;
@@ -123,8 +122,8 @@ GENERATE {
         ebu:sampleRate ?signalSampleRate .
 
     _:audioFileHqOgg
-        a ebu:MediaResource, schema:AudioObject ;
-        schema:contentUrl ?audioFileHqOggUrl ; # or ma:locator or ebu:locator
+        a ebu:MediaResource; #, schema:AudioObject ;
+        ebu:locator ?audioFileHqOggUrl ; # or ma:locator or schema:contentUrl
         ebu:bitRate 192000; # 192 kbps
         ebu:hasAudioEncodingFormat encoding_ogg: ;
         ebu:audioChannelNumber ?signalChannels ;
@@ -132,8 +131,8 @@ GENERATE {
         ebu:sampleRate ?signalSampleRate .
 
     _:audioFileLqMp3
-        a ebu:MediaResource, schema:AudioObject ;
-        schema:contentUrl ?audioFileLqMp3Url ; # or ma:locator or ebu:locator
+        a ebu:MediaResource; #, schema:AudioObject ;
+        ebu:locator ?audioFileLqMp3Url ; # or ma:locator or schema:contentUrl
         ebu:bitRate 64000; # 64 kbps
         ebu:hasAudioEncodingFormat encoding_mp3: ;
         ebu:audioChannelNumber ?signalChannels ;
@@ -141,19 +140,19 @@ GENERATE {
         ebu:sampleRate ?signalSampleRate .
 
     _:audioFileHqMp3
-        a ebu:MediaResource, schema:AudioObject ;
-        schema:contentUrl ?audioFileHqMp3Url ; # or ma:locator or ebu:locator
+        a ebu:MediaResource; #, schema:AudioObject ;
+        ebu:locator ?audioFileHqMp3Url ; # or ma:locator or schema:contentUrl
         ebu:bitRate 128000; # 128 kbps
         ebu:hasAudioEncodingFormat encoding_mp3: ;
         ebu:audioChannelNumber ?signalChannels ;
         ebu:sampleSize ?signalBitsPerSample ;
         ebu:sampleRate ?signalSampleRate .
 
-    _:defaultContainerNode a ac:AudioCollectionNode .
+    ?defaultContainerNode a ac:AudioCollectionNode .
 
     ?parentCollection
         a ac:AudioCollection ;
-        ac:memberNode _:defaultContainerNode .
+        ac:memberNode ?defaultContainerNode .
 
     ?audioPublication
         a ac:AudioPublication ;
@@ -163,11 +162,11 @@ GENERATE {
             time:inXSDDateTime ?creationDateTime
         ] .
 
-    ?signal
-        rdf:type ac:DigitalSignal ;
-        ac:channels ?signalChannels ;
-        ac:bitsPerSample ?signalBitsPerSample ;
-        ac:sampleRate ?signalSampleRate .
+#    ?signal
+#        rdf:type ac:DigitalSignal ;
+#        ac:channels ?signalChannels ;
+#        ac:bitsPerSample ?signalBitsPerSample ;
+#        ac:sampleRate ?signalSampleRate .
 
     GENERATE {?audioClip ac:audioCategory ?category}
     ITERATOR iter:JSONPath(?res, "tags[*]") AS ?tag
@@ -202,7 +201,14 @@ GENERATE {
 
     BIND(fn:JSONPath(?res, "name") AS ?title)
     BIND(fn:JSONPath(?res, "description") AS ?description)
-    BIND(REPLACE(fn:JSONPath(?res, "pack"), STR(freesound-api-packs:), STR(freesound-packs:)) AS ?packURIWithEndingSlash)
+    BIND(fn:JSONPath(?res, "pack") AS ?pack)
+
+    OPTIONAL {
+      BIND(BNODE() AS ?defaultContainerNode).
+      FILTER(BOUND(?pack))
+    }
+
+    BIND(REPLACE(?pack, STR(freesound-api-packs:), STR(freesound-packs:)) AS ?packURIWithEndingSlash)
     BIND(IRI(SUBSTR(?packURIWithEndingSlash, 1, STRLEN(?packURIWithEndingSlash) - 1)) AS ?parentCollection)
     BIND(IRI(CONCAT(STR(freesound-users:), fn:JSONPath(?res, "username"))) AS ?author)
 
