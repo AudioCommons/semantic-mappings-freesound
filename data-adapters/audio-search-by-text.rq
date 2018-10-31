@@ -12,7 +12,7 @@ PREFIX event: <http://purl.org/NET/c4dm/event.owl#>
 PREFIX time: <https://www.w3.org/2006/time#>
 PREFIX ebu: <http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#>
 PREFIX ma: <http://www.w3.org/ns/ma-ont#>
-PREFIC skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
 PREFIX encoding_mp3: <http://www.ebu.ch/metadata/ontologies/skos/ebu_AudioCompressionCodeCS#_8.4>
 PREFIX encoding_ogg: <http://www.ebu.ch/metadata/ontologies/skos/ebu_AudioCompressionCodeCS#_26>
