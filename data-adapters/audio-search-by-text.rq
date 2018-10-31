@@ -32,7 +32,7 @@ PREFIX freesound-tags: <https://w3id.org/audiocommons/services/freesound/tags/>
 
 GENERATE {
   <http://freesound.org>
-      rdf:type prov:Agent, foaf:Organization ;
+      rdf:type foaf:Organization ; # prov:Agent
       foaf:name "Freesound" .
 
   ?searchAction
@@ -46,8 +46,8 @@ GENERATE {
       schema:error ?error .
 
   ?audioCollection
-      rdf:type ac:AudioCollection, prov:Entity ;
-      prov:wasAttributedTo <http://freesound.org> ;
+      rdf:type ac:AudioCollection ; #, prov:Entity ;
+#      prov:wasAttributedTo <http://freesound.org> ;
       ac:nodeCount ?nodeCount .
 
   GENERATE {
@@ -58,7 +58,7 @@ GENERATE {
         ac:nodeContent ?audioClip .
 
     ?audioClip
-        a ac:AudioClip, prov:Entity ;
+        a ac:AudioClip; #, prov:Entity ;
         dc:title ?title ;
         dc:description ?description ;
         ac:author ?author ;
@@ -66,7 +66,7 @@ GENERATE {
         # or schema:image (which also support indirection by schema:ImageObject)
         ac:duration ?duration ;
         cc:license ?license ;
-        prov:wasAttributedTo <http://freesound.org> ;
+#        prov:wasAttributedTo <http://freesound.org> ;
         ac:defaultContainerNode _:defaultContainerNode ;
         ac:publicationOf ?signal ;
         # ac:signalChannels ?signalChannels ;
