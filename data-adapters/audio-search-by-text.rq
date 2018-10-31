@@ -11,16 +11,24 @@ PREFIX cc: <https://creativecommons.org/ns#>
 PREFIX event: <http://purl.org/NET/c4dm/event.owl#>
 PREFIX time: <https://www.w3.org/2006/time#>
 PREFIX ebu: <http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#>
+PREFIX ma: <http://www.w3.org/ns/ma-ont#>
+
+PREFIX encoding_mp3: <http://www.ebu.ch/metadata/ontologies/skos/ebu_AudioCompressionCodeCS#_8.4>
+PREFIX encoding_ogg: <http://www.ebu.ch/metadata/ontologies/skos/ebu_AudioCompressionCodeCS#_26>
+PREFIX encoding_wav: <http://www.ebu.ch/metadata/ontologies/skos/ebu_AudioCompressionCodeCS#_28>
+PREFIX encoding_flac: <http://www.ebu.ch/metadata/ontologies/skos/ebu_AudioCompressionCodeCS#_22>
 
 PREFIX freesound-api-packs: <http://freesound.org/apiv2/packs/>
 
 PREFIX freesound-sounds: <https://w3id.org/audiocommons/services/freesound/sounds/>
 PREFIX freesound-users: <https://w3id.org/audiocommons/services/freesound/users/>
 PREFIX freesound-packs: <https://w3id.org/audiocommons/services/freesound/packs/>
+PREFIX freesound-tags: <https://w3id.org/audiocommons/services/freesound/tags/>
 
-# TODO: add other previews and their description
-# TODO: add other images and their description
-# TODO: fix tags
+# TODO: check ac:image usage
+# TODO: check ac:author is not in the ontology
+# TODO: which vocab use to describe images?
+# TODO: check previews and signal descriptions
 
 GENERATE {
   <http://freesound.org>
@@ -54,14 +62,92 @@ GENERATE {
         dc:title ?title ;
         dc:description ?description ;
         ac:author ?author ;
-        ac:image ?image ;
+        ac:image _:waveform_image_m, _:waveform_image_l, _:spectral_image_m, _:spectral_image_l ;
+        # or schema:image (which also support indirection by schema:ImageObject)
         ac:duration ?duration ;
         cc:license ?license ;
         prov:wasAttributedTo <http://freesound.org> ;
         ac:defaultContainerNode _:defaultContainerNode ;
-        ac:audioCategory ?tagSet ;
-        ac:encodesDigitalSignal ?signal ;
-        ac:available_as ?audioFileLqOgg .
+        ac:publicationOf ?signal ;
+        # ac:signalChannels ?signalChannels ;
+        # ac:bitsPerSample ?signalBitsPerSample ;
+        # ac:sampleRate ?signalSampleRate ;
+        ac:originalFile _:originalAudioFile ;
+        ac:available_as _:originalAudioFile, _:audioFileLqOgg, _:audioFileHqOgg, _:audioFileLqMp3, _:audioFileHqMp3 .
+        # or schema:encoding (it would break FRBR, but just saying...)
+
+    _:waveform_image_m
+        a ebu:Picture, ma:Image, schema:ImageObject ; # afv:Waveform?
+        schema:contentUrl ?waveform_image_m_url ; # or ma:locator or ebu:locator
+        schema:caption "Waveform" ;
+        schema:height 71 ; # or ma:frameHeight or ebu:height
+        schema:width 120 . # or ma:frameWidth or ebu:width
+
+    _:waveform_image_l
+        a ebu:Picture, ma:Image, schema:ImageObject ; # afv:Waveform?
+        schema:contentUrl ?waveform_image_l_url ;
+        schema:caption "Waveform" ;
+        schema:height 201 ;
+        schema:width 900 .
+
+    _:spectral_image_m
+        a ebu:Picture, ma:Image, schema:ImageObject ; # afv:Spectrogram?
+        schema:contentUrl ?spectral_image_m_url ;
+        schema:caption "Spectrogram" ;
+        schema:height 50 ;
+        schema:width 50 .
+
+    _:spectral_image_l
+        a ebu:Picture, ma:Image, schema:ImageObject ; # afv:Spectrogram?
+        schema:contentUrl ?spectral_image_l_url ;
+        schema:caption "Spectrogram" ;
+        schema:height 201 ;
+        schema:width 900 .
+
+    _:originalAudioFile
+        a ebu:MediaResource, schema:AudioObject ;
+        schema:contentUrl ?originalAudioFileUrl ; # or ma:locator or ebu:locator
+        ebu:bitRate ?originalAudioFileBitrate;
+        ebu:hasAudioEncodingFormat ?originalAudioFileEncoding ;
+        ebu:audioChannelNumber ?signalChannels ;
+        ebu:sampleSize ?signalBitsPerSample ;
+        ebu:sampleRate ?signalSampleRate .
+
+    _:audioFileLqOgg
+        a ebu:MediaResource, schema:AudioObject ;
+        schema:contentUrl ?audioFileLqOggUrl ; # or ma:locator or ebu:locator
+        ebu:bitRate 80000; # 80 kbps or ma:frameWidth or ebu:width
+        ebu:hasAudioEncodingFormat encoding_ogg: ;
+        ebu:audioChannelNumber ?signalChannels ;
+        ebu:sampleSize ?signalBitsPerSample ;
+        ebu:sampleRate ?signalSampleRate .
+
+    _:audioFileHqOgg
+        a ebu:MediaResource, schema:AudioObject ;
+        schema:contentUrl ?audioFileHqOggUrl ; # or ma:locator or ebu:locator
+        ebu:bitRate 192000; # 192 kbps
+        ebu:hasAudioEncodingFormat encoding_ogg: ;
+        ebu:audioChannelNumber ?signalChannels ;
+        ebu:sampleSize ?signalBitsPerSample ;
+        ebu:sampleRate ?signalSampleRate .
+
+    _:audioFileLqMp3
+        a ebu:MediaResource, schema:AudioObject ;
+        schema:contentUrl ?audioFileLqMp3Url ; # or ma:locator or ebu:locator
+        ebu:bitRate 64000; # 64 kbps
+        ebu:hasAudioEncodingFormat encoding_mp3: ;
+        ebu:audioChannelNumber ?signalChannels ;
+        ebu:sampleSize ?signalBitsPerSample ;
+        ebu:sampleRate ?signalSampleRate .
+
+    _:audioFileHqMp3
+        a ebu:MediaResource, schema:AudioObject ;
+        schema:contentUrl ?audioFileHqMp3Url ; # or ma:locator or ebu:locator
+        ebu:bitRate 128000; # 128 kbps
+        ebu:hasAudioEncodingFormat encoding_mp3: ;
+        ebu:audioChannelNumber ?signalChannels ;
+        ebu:sampleSize ?signalBitsPerSample ;
+        ebu:sampleRate ?signalSampleRate .
 
     _:defaultContainerNode a ac:AudioCollectionNode .
 
@@ -83,7 +169,12 @@ GENERATE {
         ac:bitsPerSample ?signalBitsPerSample ;
         ac:sampleRate ?signalSampleRate .
 
-    ?audioFileLqOgg rdf:type ac:AudioFile .
+    GENERATE {?audioClip ac:audioCategory ?category}
+    ITERATOR iter:JSONPath(?res, "tags[*]") AS ?tag
+    WHERE {
+      BIND(STR(?tag) AS ?tagStr)
+      BIND(IRI(CONCAT(STR(freesound-tags:), SUBSTR(?tagStr, 2, STRLEN(?tagStr) - 2))) AS ?category)
+    } .
   }
   ITERATOR iter:JSONElement(?source,"results[*]") AS ?resIterator
   WHERE {
@@ -93,17 +184,41 @@ GENERATE {
     BIND(?indexFromZero + 1 AS ?index)
 
     BIND(IRI(CONCAT(STR(freesound-sounds:), STR(fn:JSONPath(?res, "id")))) AS ?audioClip)
-#    BIND(IRI(fn:JSONPath(?res, "url")) AS ?audioClip)
+    BIND(IRI(fn:JSONPath(?res, "url")) AS ?homepage)
+    BIND(IRI(fn:JSONPath(?res, "download")) AS ?originalAudioFileUrl)
+    BIND(IRI(fn:JSONPath(?res, "bitrate")) AS ?originalAudioFileBitrate)
+    BIND(COALESCE(fn:JSONPath(?res, "type"), "unknown") AS ?originalAudioFileEncodingType)
+
+    OPTIONAL {
+      VALUES (?originalAudioFileEncodingType ?originalAudioFileEncoding) {
+        ("wav" encoding_wav:)
+      #  ("aif")
+      #  ("aiff")
+        ("mp3" encoding_mp3:)
+      #  ("m4a")
+        ("flac" encoding_flac:)
+      }
+    }
+
     BIND(fn:JSONPath(?res, "name") AS ?title)
     BIND(fn:JSONPath(?res, "description") AS ?description)
     BIND(REPLACE(fn:JSONPath(?res, "pack"), STR(freesound-api-packs:), STR(freesound-packs:)) AS ?packURIWithEndingSlash)
     BIND(IRI(SUBSTR(?packURIWithEndingSlash, 1, STRLEN(?packURIWithEndingSlash) - 1)) AS ?parentCollection)
     BIND(IRI(CONCAT(STR(freesound-users:), fn:JSONPath(?res, "username"))) AS ?author)
-    BIND(IRI(fn:JSONPath(?res, "images.waveform_m")) AS ?image)
+
+    BIND(IRI(fn:JSONPath(?res, "images.waveform_m")) AS ?waveform_image_m_url)
+    BIND(IRI(fn:JSONPath(?res, "images.waveform_l")) AS ?waveform_image_l_url)
+    BIND(IRI(fn:JSONPath(?res, "images.spectral_m")) AS ?spectral_image_m_url)
+    BIND(IRI(fn:JSONPath(?res, "images.spectral_l")) AS ?spectral_image_l_url)
+
     BIND(1000 * fn:JSONPath(?res, "duration") AS ?duration)
     BIND(IRI(fn:JSONPath(?res, "license")) AS ?license)
-    BIND(IRI(fn:JSONPath(?res, "tags")) AS ?tagSet)
-    BIND(IRI(fn:JSONPath(?res, "previews.preview-lq-ogg")) AS ?audioFileLqOgg)
+    BIND(fn:JSONPath(?res, "tags") AS ?tagSet)
+
+    BIND(IRI(fn:JSONPath(?res, "previews.preview-lq-ogg")) AS ?audioFileLqOggUrl)
+    BIND(IRI(fn:JSONPath(?res, "previews.preview-hq-ogg")) AS ?audioFileHqOggUrl)
+    BIND(IRI(fn:JSONPath(?res, "previews.preview-lq-mp3")) AS ?audioFileLqMp3Url)
+    BIND(IRI(fn:JSONPath(?res, "previews.preview-hq-mp3")) AS ?audioFileHqMp3Url)
 
     BIND(BNODE() AS ?signal)
     BIND(fn:JSONPath(?res, "channels") AS ?signalChannels)
@@ -113,7 +228,6 @@ GENERATE {
     BIND(BNODE() AS ?audioPublication)
     BIND(xsd:dateTime(fn:JSONPath(?res, "created")) AS ?creationDateTime)
   } .
-
 }
 SOURCE <http://freesound.org/apiv2/search/text/?query=$pattern&token=$token&fields=id,name,description,images,pack,username,created,duration,license,tags,channels,bitdepth,samplerate,previews> AS ?source
 WHERE {
