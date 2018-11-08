@@ -72,7 +72,7 @@ GENERATE {
         # ac:bitsPerSample ?signalBitsPerSample ;
         # ac:sampleRate ?signalSampleRate ;
         ac:originalFile _:originalAudioFile ;
-        ac:available_as _:originalAudioFile, _:audioFileLqOgg, _:audioFileHqOgg, _:audioFileLqMp3, _:audioFileHqMp3 .
+        ac:available_as _:audioFileLqOgg, _:audioFileHqOgg, _:audioFileLqMp3, _:audioFileHqMp3 .
         # or schema:encoding (it would break FRBR, but just saying...)
 
     _:waveform_image_m
