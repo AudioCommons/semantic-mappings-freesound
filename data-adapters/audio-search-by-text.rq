@@ -104,7 +104,7 @@ GENERATE {
         ebu:frameWidth 900 .
 
     _:originalAudioFile
-        a ebu:MediaResource; #, schema:AudioObject ;
+        a ac:AudioFile; #, schema:AudioObject ;
         ebu:locator ?originalAudioFileUrl ; # or ma:locator or schema:contentUrl
         ebu:bitRate ?originalAudioFileBitrate;
         ebu:hasAudioEncodingFormat ?originalAudioFileEncoding ;
@@ -113,7 +113,7 @@ GENERATE {
         ebu:sampleRate ?signalSampleRate .
 
     _:audioFileLqOgg
-        a ebu:MediaResource; #, schema:AudioObject ;
+        a ac:AudioFile; #, schema:AudioObject ;
         ebu:locator ?audioFileLqOggUrl ; # or ma:locator or schema:contentUrl
         ebu:bitRate 80000; # 80 kbps or ma:frameWidth or ebu:width
         ebu:hasAudioEncodingFormat encoding_ogg: ;
@@ -122,7 +122,7 @@ GENERATE {
         ebu:sampleRate ?signalSampleRate .
 
     _:audioFileHqOgg
-        a ebu:MediaResource; #, schema:AudioObject ;
+        a ac:AudioFile; #, schema:AudioObject ;
         ebu:locator ?audioFileHqOggUrl ; # or ma:locator or schema:contentUrl
         ebu:bitRate 192000; # 192 kbps
         ebu:hasAudioEncodingFormat encoding_ogg: ;
@@ -131,7 +131,7 @@ GENERATE {
         ebu:sampleRate ?signalSampleRate .
 
     _:audioFileLqMp3
-        a ebu:MediaResource; #, schema:AudioObject ;
+        a ac:AudioFile; #, schema:AudioObject ;
         ebu:locator ?audioFileLqMp3Url ; # or ma:locator or schema:contentUrl
         ebu:bitRate 64000; # 64 kbps
         ebu:hasAudioEncodingFormat encoding_mp3: ;
@@ -140,7 +140,7 @@ GENERATE {
         ebu:sampleRate ?signalSampleRate .
 
     _:audioFileHqMp3
-        a ebu:MediaResource; #, schema:AudioObject ;
+        a ac:AudioFile; #, schema:AudioObject ;
         ebu:locator ?audioFileHqMp3Url ; # or ma:locator or schema:contentUrl
         ebu:bitRate 128000; # 128 kbps
         ebu:hasAudioEncodingFormat encoding_mp3: ;
