@@ -259,7 +259,7 @@ WHERE {
       STR(freesound-api:), "search/text/",
       "?token=", ENCODE_FOR_URI($token),
       "&fields=",
-          "id,name,description,images,pack,username,created,duration,license,"
+          "id,name,description,images,pack,username,created,duration,license,",
           "tags,channels,bitdepth,samplerate,previews",
       "&pattern=", ENCODE_FOR_URI($pattern) )) AS ?serviceCall)
 }
