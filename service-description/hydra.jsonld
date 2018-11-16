@@ -1,0 +1,17 @@
+{
+  "@context": {
+    "@context": "http://www.w3.org/ns/hydra/context.jsonld",
+    "freesound": "http://audiocommons.org/freesound/"
+  },
+  "@id": "http://freesound.org/doc",
+  "@type": "ApiDocumentation",
+  "entrypoint": {
+    "@id": "freesound:repository",
+    "@type": ["acx:AudioRepository", "Resource"],
+    "operation": {
+      "@type": ["acx:AudioSearchOperation", "Operation"],
+      "expects": "",
+      "returns": ""
+    }
+  }
+}

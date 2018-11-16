@@ -1,0 +1,32 @@
+{
+  "@context": {
+    "schema": "http://schema.org/",
+    "@vocab": "http://schema.org/",
+    "webapi": "https://actions.semantify.it/vocab/"
+  },
+  "@id": "http://freesound.org/",
+  "@type": "ac:AudioRepository",
+  "potentialAction": {
+    "@id": "freesoundSearch",
+    "@type": ["SearchAction", "webapi:AuthenticateAction"],
+    "query-input": {
+      "@type": "PropertyValueSpecification",
+      "valueRequired": true,
+      "valueMaxlength": 100,
+      "valueName": "query"
+    },
+    "instrument": {
+      "@type": "webapi:TokenAuthentication",
+      "webapi:bearerToken": "token",
+      "webapi:tokenFormat": "URL"
+    },
+    "target": {
+      "@type": "EntryPoint",
+      "contentType": "The supported content type(s) for an EntryPoint response.",
+      "encodingType":	"The supported encoding type(s) for an EntryPoint request.",
+      "httpMethod": "GET",
+      "urlTemplate": "...",
+      "acx:sparqlGenerateTemplate": "..."
+    }
+  }
+}

@@ -1,0 +1,49 @@
+PREFIX ac: <https://w3id.org/ac-ontology/aco#>
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+PREFIX iter: <http://w3id.org/sparql-generate/iter/>
+PREFIX fn: <http://w3id.org/sparql-generate/fn/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+
+GENERATE {
+  ?audioCollection
+    rdf:type ac:AudioCollection, prov:Entity ;
+    prov:wasAttributedTo <http://freesound.org> ;
+    ac:memberNode ?audioCollectionNode ;
+    ac:nodeCount ?nodeCount .
+
+    GENERATE {
+      ?audioCollectionNode
+        a ac:AudioCollectionNode ;
+        ac:nodeIndex ?index ;
+        ac:nodeContent ?audioClip .
+
+      ?audioClip
+        rdf:type ac:AudioClip, prov:Entity ;
+        ac:available_as ?audioFile ;
+        dc:title ?title ;
+        prov:wasAttributedTo <http://freesound.org> .
+
+      ?audioFile rdf:type ac:AudioFile .
+    }
+    ITERATOR iter:JSONElement(?source,"$.results[*]") AS ?resIterator
+    WHERE {
+      BIND(fn:JSONPath(?resIterator, "element") AS ?res)
+      BIND(fn:JSONPath(?resIterator, "position") AS ?indexFromZero)
+      BIND(?indexFromZero + 1 AS ?index)
+      BIND(IRI(fn:JSONPath(?res, "url")) AS ?audioClip)
+      BIND(IRI(fn:JSONPath(?res, "previews.preview-lq-ogg")) AS ?audioFile)
+      BIND(fn:JSONPath(?res, "name") AS ?title)
+      BIND(BNODE() AS ?audioCollectionNode)
+    }.
+
+  <http://freesound.org>
+    rdf:type prov:Agent, foaf:Organization ;
+    foaf:name "Freesound" .
+}
+SOURCE <http://freesound.org/apiv2/search/text/?query=$pattern&token=$token&fields=id,url,download,previews,name,preview-lq> AS ?source
+WHERE {
+  BIND(BNODE() AS ?audioCollection)
+  BIND(fn:JSONPath(?source,"$.results.length") AS ?nodeCount)
+}
