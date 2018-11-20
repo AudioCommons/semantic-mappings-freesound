@@ -261,7 +261,7 @@ WHERE {
       "&fields=",
           "id,name,description,images,pack,username,created,duration,license,",
           "tags,channels,bitdepth,samplerate,previews",
-      "&pattern=", ENCODE_FOR_URI($pattern),
+      "&query=", ENCODE_FOR_URI($pattern),
       IF(BOUND($limit),CONCAT("&page_size=", ENCODE_FOR_URI(STR($limit))),""),
       IF(BOUND($page),CONCAT("&page=", ENCODE_FOR_URI(STR($page))),"")
   )) AS ?serviceCall)
