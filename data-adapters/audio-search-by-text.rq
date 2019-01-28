@@ -27,16 +27,26 @@ PREFIX freesound-users: <https://w3id.org/audiocommons/services/freesound/users/
 PREFIX freesound-packs: <https://w3id.org/audiocommons/services/freesound/packs/>
 PREFIX freesound-tags: <https://w3id.org/audiocommons/services/freesound/tags/>
 
-# TODO: check ac:author is not in the ontology
+# Adapter from Freesound search service to Audio Commons Ecosystem (http://audiocommons.org/).
+#
+# Input parameters:
+#   - $token (required): freesound API key
+#   - $pattern (required): text used for search
+#   - $limit: max number of results (default: 15)
+#   - $page: results page number (default: 1)
+
 # TODO: find a way to distinguish spectrograms from waveforms without using the labels
 
 GENERATE {
 
   GENERATE {
+
+    # Generate Freesound description for provenance
     <http://freesound.org>
         rdf:type foaf:Organization ; # prov:Agent
         foaf:name "Freesound" .
 
+    # Generate search action description
     ?searchAction
         a schema:SearchAction ;
         schema:object <http://freesound.org> ;
@@ -47,18 +57,21 @@ GENERATE {
         schema:result ?audioCollection ;
         schema:error ?error .
 
+    # If service call to Freesound was successful, generate audio collection resource
     ?audioCollection
         rdf:type ac:AudioCollection ; #, prov:Entity ;
   #      prov:wasAttributedTo <http://freesound.org> ;
         ac:nodeCount ?nodeCount .
 
     GENERATE {
+      # Generate node for the audio collection
     	?audioCollection ac:memberNode ?audioCollectionNode .
       ?audioCollectionNode
           a ac:AudioCollectionNode ;
           ac:nodeIndex ?index ;
           ac:nodeContent ?audioClip .
 
+      # Generate audio clip as content of the audio collection node
       ?audioClip
           a ac:AudioClip; #, prov:Entity ;
           dc:title ?title ;
@@ -171,6 +184,7 @@ GENERATE {
   #        ac:bitsPerSample ?signalBitsPerSample ;
   #        ac:sampleRate ?signalSampleRate .
 
+      # Bind a ?category for each used tag
       GENERATE {?audioClip ac:audioCategory ?category}
       ITERATOR iter:JSONPath(?res, "tags[*]") AS ?tag
       WHERE {
@@ -178,14 +192,19 @@ GENERATE {
         BIND(IRI(CONCAT(STR(freesound-tags:), SUBSTR(?tagStr, 2, STRLEN(?tagStr) - 2))) AS ?category)
       } .
     }
+    # Iterate over result set
     ITERATOR iter:JSONElement(?source,"results[*]") AS ?resIterator
     WHERE {
+      # Bind blank node to ?audioCollectionNode
       BIND(BNODE() AS ?audioCollectionNode)
       BIND(fn:JSONPath(?resIterator, "element") AS ?res)
       BIND(fn:JSONPath(?resIterator, "position") AS ?indexFromZero)
       BIND(?indexFromZero + 1 AS ?index)
 
+      # From Freesound ID, mint URI for ?audioClip
       BIND(IRI(CONCAT(STR(freesound-sounds:), STR(fn:JSONPath(?res, "id")))) AS ?audioClip)
+
+      # Bind relevant metadata
       BIND(IRI(fn:JSONPath(?res, "url")) AS ?homepage)
       BIND(IRI(fn:JSONPath(?res, "download")) AS ?originalAudioFileUrl)
       BIND(IRI(fn:JSONPath(?res, "bitrate")) AS ?originalAudioFileBitrate)
@@ -238,8 +257,16 @@ GENERATE {
       BIND(xsd:dateTime(fn:JSONPath(?res, "created")) AS ?creationDateTime)
     } .
   }
+  # Call service and bind the response to ?source
   SOURCE ?serviceCall AS ?source
   WHERE {
+    # Bind blank node to ?searchAction
+    # If successful :
+    #   Bind ?resultSet to JSON result set
+    #   Bind ?actionStatus to schema:CompletedActionStatus
+    #   Bind blank node to ?audioCollection
+    # Else :
+    #   Bind blank node to ?error
     BIND(BNODE() AS ?searchAction)
     BIND(fn:JSONPath(?source, "results") AS ?resultSet)
     BIND(IF(BOUND(?resultSet), schema:CompletedActionStatus, schema:FailedActionStatus) AS ?actionStatus)
@@ -255,6 +282,7 @@ GENERATE {
   } .
 }
 WHERE {
+  # Generate URL for service call, based on input parameters
   BIND(IRI(CONCAT(
       STR(freesound-api:), "search/text/",
       "?token=", ENCODE_FOR_URI($token),
