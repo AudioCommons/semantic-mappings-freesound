@@ -184,11 +184,12 @@ GENERATE {
   #        ac:bitsPerSample ?signalBitsPerSample ;
   #        ac:sampleRate ?signalSampleRate .
 
-      # Bind a ?category for each used tag
+      # Generate `ac:audioCategory` from tags
       GENERATE {?audioClip ac:audioCategory ?category}
       ITERATOR iter:JSONPath(?res, "tags[*]") AS ?tag
       WHERE {
         BIND(STR(?tag) AS ?tagStr)
+        # Bind a ?category for each used tag
         BIND(IRI(CONCAT(STR(freesound-tags:), SUBSTR(?tagStr, 2, STRLEN(?tagStr) - 2))) AS ?category)
       } .
     }
